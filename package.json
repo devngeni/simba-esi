@@ -1,0 +1,33 @@
+{
+	"name": "simba-esi",
+	"version": "1.0.0",
+	"description": "Financial Portfolio Analysis",
+	"main": "index.ts",
+	"scripts": {
+		"dev": "ts-node-dev ./src/index.ts"
+	},
+	"keywords": [
+		"Financial",
+		"Analysis",
+		"Google",
+		"spreadsheet"
+	],
+	"author": "Enock Kipkoech",
+	"license": "ISC",
+	"dependencies": {
+		"@types/cors": "^2.8.13",
+		"connect-timeout": "^1.9.0",
+		"cors": "^2.8.5",
+		"express": "^4.18.2",
+		"swagger-ui-express": "^4.6.3",
+		"ts-node": "^10.9.1",
+		"ts-node-dev": "^2.0.0"
+	},
+	"devDependencies": {
+		"@types/connect-timeout": "^0.0.37",
+		"@types/express": "^4.17.17",
+		"@types/node": "^20.2.3",
+		"@types/swagger-ui-express": "^4.1.3",
+		"typescript": "^5.0.4"
+	}
+}
