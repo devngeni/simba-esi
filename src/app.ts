@@ -1,28 +1,24 @@
-import express, { Request, Response } from "express";
-import swaggerUi from "swagger-ui-express";
+import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import timeout from "connect-timeout";
 
-const app = express();
+const app: Application = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(timeout("60s")); // 1 minutes
 
-app.use(swaggerUi.serve);
+import "./routes/index";
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
 	res.status(200).json({
 		status: `success`,
 		message: `Simba ESI Platform`,
-		data: "Hakuna Matata! (matarra)",
 	});
 });
-
-import "./routes";
 
 // handle errors
 app.all("*", async (_req, res) => {
