@@ -60,7 +60,7 @@ router.get("/gsheet", async (req: Request, res: Response) => {
 			console.log("Name, Major, ETC:");
 			for (const row of rows) {
 				// Print columns A and E, which correspond to indices 0 and 4.
-				console.log(`${row[0]}, ${row[2]}`);
+				console.log(`${row[0]}, ${row[1]}${row[2]}`);
 			}
 		}
 
