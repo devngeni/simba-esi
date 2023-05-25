@@ -1,73 +1,61 @@
 import { config } from "../config";
 import { Router, Request, Response } from "express";
-// import { GoogleSpreadsheet } from "google-spreadsheet";
 import { google } from "googleapis";
-// const { GoogleAuth } = require("google-auth-library");
+import { oauth2Client } from "./authClient";
+import { Research, IResearch } from "../models";
 
 const router = Router();
 
-import googleKeys from "./../../googleKeys.json";
-console.log("googleKeys: ", googleKeys);
-
-// CheckConnection to Google Sheet API
-export const authorize = async () => {
-	const auth = new google.auth.GoogleAuth({
-		scopes: [
-			"https://www.googleapis.com/auth/cloud-platform",
-			"https://www.googleapis.com/auth/spreadsheets",
-		],
-		keyFile: "./googleKeys.json",
-	});
-
-	const client = await auth.getClient();
-	console.log("Client: ", client);
-
-	if (client.credentials === null) {
-		throw new Error(`authentication failed`);
-	} else {
-		return client;
-	}
-};
-
-const oauth2Client = google.auth.fromAPIKey(config.GOOGLE.GSHEET_API_KEY);
-
-// set auth as a global default
+// GLOBAL AUTH
 google.options({
 	auth: oauth2Client,
 });
 
+// GSheet Router
 router.get("/gsheet", async (req: Request, res: Response) => {
 	try {
-		// const auth = new google.auth.GoogleAuth({
-		// 	keyFile: "./googleKeys.json",
-		// 	scopes: [
-		// 		"https://www.googleapis.com/auth/cloud-platform",
-		// 		"https://www.googleapis.com/auth/spreadsheets",
-		// 	],
-		// });
+		let sheets = google.sheets({ version: "v4", auth: oauth2Client });
 
-		let spreadsheet = google.sheets({ version: "v4", auth: oauth2Client });
+		const ResearchCells = ["F10", "G28"];
 
-		const resp = await spreadsheet.spreadsheets.values.get({
+		const getResaerch = await sheets.spreadsheets.values.batchGet({
 			spreadsheetId: config.GOOGLE.GSHEET_ID,
-			range: "Sheet1!A1:C2",
+			ranges: ResearchCells,
 		});
 
-		const rows = resp.data.values;
-		if (!rows || rows.length === 0) {
+		console.log(JSON.stringify(getResaerch.data.valueRanges!, null, 2));
+
+		const ResearchRanges = ["A10:A45", "Research!D10:D45"];
+		const resp = await sheets.spreadsheets.values.batchGet({
+			spreadsheetId: config.GOOGLE.GSHEET_ID,
+			ranges: ResearchRanges,
+		});
+
+		const cols = resp.data.valueRanges;
+		// console.log(JSON.stringify(cols));
+		// console.log(`Data Count: ${cols.}`);
+
+		let researchData = [];
+		if (!cols || cols.length === 0) {
 			console.log("No data found.");
 		} else {
-			console.log("Name, Major, ETC:");
-			for (const row of rows) {
-				// Print columns A and E, which correspond to indices 0 and 4.
-				console.log(`${row[0]}, ${row[1]}${row[2]}`);
+			for (const col of cols) {
+				console.log(col);
+				researchData.push(col);
 			}
 		}
+
+		// TODO Save to DB
+		// const researchDBData:IResearch = {
+		// 	// TODO
+		// 		}
+
+		// const research = await Research.create(researchDBData);
 
 		res.status(200).json({
 			status: `success`,
 			message: `Simba ESI Platform`,
-			data: "GSHEET Hakuna Matata! (matarra)",
+			data: researchData,
 		});
 	} catch (error) {
 		console.error(error);
